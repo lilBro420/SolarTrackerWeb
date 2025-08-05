@@ -601,6 +601,3 @@ app.post('/api/verificar-token', (req, res) => {
     res.json({ valid: true, message: 'Token válido.' });
   });
 });
-app.get('/', (req, res) => {
-  res.send('Server is running!');
-});
