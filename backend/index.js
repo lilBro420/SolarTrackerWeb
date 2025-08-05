@@ -597,7 +597,7 @@ app.post('/api/verificar-token', (req, res) => {
       return res.status(401).json({ valid: false, message: 'Código inválido.' });
     }
 
-    console.log(' Token válido y no caducado para el correo:', correo);
+    console.log(' Token válido y no caducado para el correo, estimado:', correo);
     res.json({ valid: true, message: 'Token válido.' });
   });
 });
