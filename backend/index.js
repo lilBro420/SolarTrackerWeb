@@ -34,6 +34,11 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
+//mandar al login
+app.get('/', (req, res) => {
+  res.redirect('https://solartrackerwebfront.onrender.com/');
+});
+
 // --- Verificar conexión inicial ---
 pool.getConnection((err, connection) => {
   if (err) {
