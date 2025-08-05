@@ -339,10 +339,10 @@ app.get('/api/reportes-semanales', (req, res) => {
   });
 });
 
-const PORT = process.env.PORT || 3000;
+/* const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌐 Servidor corriendo en http://localhost:${PORT}`);
-});
+}); */
 
 //GRAFICAS
 
@@ -409,24 +409,47 @@ app.get('/api/panel-solar/consumo-diario', (req, res) => {
 
 //TRES
 // --- INCLINACION LONGITUDINAL SEMANAL (Para MonthlySunPathChart, renombrada a Semanal) ---
-app.get('/api/reportes/inclinacion-semanal', (req, res) => {
-  // Obtenemos los últimos 7 reportes para mostrar una tendencia semanal
+// --- INCLINACION LONGITUDINAL SEMANAL (Para MonthlySunPathChart, renombrada a Semanal) ---
+app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
+  const limit = parseInt(req.query.limit) || 5;
+
+  console.log('🔍 Llamada recibida a /api/panel-solar/ultimos-movimientos con limit =', limit);
+
+  // Validar límite
+  if (isNaN(limit) || limit <= 0 || limit > 100) {
+    console.warn('⚠️ Límite inválido:', limit);
+    return res.status(400).json({ error: 'El parámetro "limit" debe ser un número positivo y menor o igual a 100.' });
+  }
+
+  // Consulta
   const sql = `
     SELECT
-        fecha_inicio_semana,
-        inclinacion_longitudinal_promedio
-    FROM reportes
-    ORDER BY fecha_inicio_semana DESC
-    LIMIT 7;
+      fecha_hora,
+      direccion_cardinal
+    FROM Solar_Tracker
+    ORDER BY fecha_hora DESC
+    LIMIT ?;
   `;
 
-  pool.query(sql, (err, results) => {
+  console.log('🧠 Ejecutando consulta SQL:\n', sql);
+  
+  pool.query(sql, [limit], (err, results) => {
     if (err) {
-      console.error(' Error al obtener inclinación semanal de reportes:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener reportes de inclinación semanal.' });
+      console.error('❌ Error al ejecutar la consulta SQL:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener datos en tiempo real.' });
     }
-    console.log(' Datos de inclinación semanal obtenidos.');
-    res.json(results);
+
+    console.log(`📦 Resultados obtenidos (${results.length}):`, results);
+
+    if (results.length === 0) {
+      console.log('ℹ️ No hay datos disponibles.');
+      return res.status(404).json({ message: 'No hay datos de movimientos recientes disponibles.' });
+    }
+
+    const sortedResults = results.reverse(); // De más viejo a más nuevo
+    console.log('🔄 Resultados ordenados (de más viejo a más nuevo):', sortedResults);
+
+    res.json(sortedResults);
   });
 });
 
@@ -445,7 +468,7 @@ app.get('/api/reportes/estado-panel', (req, res) => {
 
   pool.query(sql, (err, results) => {
     if (err) {
-      console.error(' Error al obtener estado operacional del panel:', err);
+      console.error('Error al obtener estado operacional del panel:', err);
       return res.status(500).json({ error: 'Error del servidor al obtener el estado operacional del panel.' });
     }
 
