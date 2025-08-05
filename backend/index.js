@@ -339,10 +339,10 @@ app.get('/api/reportes-semanales', (req, res) => {
   });
 });
 
-/* const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`🌐 Servidor corriendo en http://localhost:${PORT}`);
-}); */
+});
 
 //GRAFICAS
 
@@ -408,8 +408,6 @@ app.get('/api/panel-solar/consumo-diario', (req, res) => {
 });
 
 //TRES
-// --- INCLINACION LONGITUDINAL SEMANAL (Para MonthlySunPathChart, renombrada a Semanal) ---
-// --- INCLINACION LONGITUDINAL SEMANAL (Para MonthlySunPathChart, renombrada a Semanal) ---
 app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
   const limit = parseInt(req.query.limit) || 5;
 
@@ -417,7 +415,7 @@ app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
 
   // Validar límite
   if (isNaN(limit) || limit <= 0 || limit > 100) {
-    console.warn('⚠️ Límite inválido:', limit);
+    console.warn(' Límite inválido:', limit);
     return res.status(400).json({ error: 'El parámetro "limit" debe ser un número positivo y menor o igual a 100.' });
   }
 
@@ -431,23 +429,23 @@ app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
     LIMIT ?;
   `;
 
-  console.log('🧠 Ejecutando consulta SQL:\n', sql);
+  console.log(' Ejecutando consulta SQL:\n', sql);
   
   pool.query(sql, [limit], (err, results) => {
     if (err) {
-      console.error('❌ Error al ejecutar la consulta SQL:', err);
+      console.error(' Error al ejecutar la consulta SQL:', err);
       return res.status(500).json({ error: 'Error del servidor al obtener datos en tiempo real.' });
     }
 
-    console.log(`📦 Resultados obtenidos (${results.length}):`, results);
+    console.log(` Resultados obtenidos (${results.length}):`, results);
 
     if (results.length === 0) {
-      console.log('ℹ️ No hay datos disponibles.');
+      console.log(' No hay datos disponibles.');
       return res.status(404).json({ message: 'No hay datos de movimientos recientes disponibles.' });
     }
 
     const sortedResults = results.reverse(); // De más viejo a más nuevo
-    console.log('🔄 Resultados ordenados (de más viejo a más nuevo):', sortedResults);
+    console.log(' Resultados ordenados (de más viejo a más nuevo):', sortedResults);
 
     res.json(sortedResults);
   });
