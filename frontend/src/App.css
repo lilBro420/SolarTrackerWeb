@@ -1,0 +1,163 @@
+/* Sección general con fondo degradado futurista */
+section {
+  background: linear-gradient(135deg, hsl(0, 0%, 100%), #f8fcff);
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #f8fcff;
+  font-family: 'Orbitron', sans-serif; /* Requiere importar en HTML */
+}
+
+/* Barra de navegación con efecto neón */
+.navBg {
+  background: linear-gradient(90deg, hsl(205, 50%, 23%), #2c415c);
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+  padding: 0 20px;
+}
+
+/* Menú con espaciado amplio y estilo limpio */
+.menu {
+  display: flex;
+  gap: 50px;
+}
+
+/* Estilo de enlaces con animación y efecto glow */
+.menu .nav-link {
+  text-decoration: none;
+  font-weight: bold;
+  font-size: 22px;
+  letter-spacing: 3px;
+  word-spacing: 12px;
+  color: #ffffff;
+  position: relative;
+  transition: color 0.4s ease, transform 0.3s ease;
+}
+
+.menu .nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0%;
+  height: 2px;
+  background-color: #f6992b;
+  transition: width 0.3s ease;
+}
+
+.menu .nav-link:hover {
+  color: #f6992b;
+  transform: scale(1.1);
+}
+
+.menu .nav-link:hover::after {
+  width: 100%;
+}
+.logo-menu-container {
+  position: fixed;
+  top: 7px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.logo-icon {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%; /* opcional: estilo circular */
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.logo-icon:hover {
+  transform: scale(1.1);
+}
+
+.menu-desplegable {
+  margin-top: 10px;
+  padding: 10px;
+  background-color: #ffffff;
+  border: 1px solid #ccc;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-menu-container {
+  position: fixed;
+  top: 7px;
+  right: 20px;
+  z-index: 1000;
+}
+
+.logo-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: rgba(60, 60, 60, 0.6); /* gris semitransparente */
+  padding: 8px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.logo-toggle:hover {
+  background-color: rgba(80, 80, 80, 0.8);
+}
+
+.logo-icon {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+}
+
+.arrow {
+  font-size: 10px;
+  color: white;
+  transition: transform 0.3s ease;
+}
+
+.arrow.arriba {
+  transform: rotate(0deg);
+}
+
+.arrow.abajo {
+  transform: rotate(180deg);
+}
+
+.menu-desplegable {
+  background-color: rgba(30, 30, 30, 0.7);
+  border-radius: 10px;
+  margin-top: 10px;
+  padding: 20px;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.menu-desplegable .nav-link {
+  color: white;
+  padding: 4px 50px;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+  text-decoration: none;
+}
+
+.menu-desplegable .nav-link:hover {
+  background-color: rgba(255,255,255,0.1);
+  text-decoration: none;
+  display: block;
+  text-align: left;
+}
+@import url("https://unpkg.com/leaflet/dist/leaflet.css");
+
+.marker-icon {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+}
