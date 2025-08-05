@@ -88,7 +88,7 @@ export default function RealtimeDirectionChart() {
           ],
         });
       } catch (err) {
-        console.error("❌ Error al obtener datos:", err);
+        console.error(" Error al obtener datos:", err);
         setError(`Error: No se pudieron cargar los datos de dirección en tiempo real. ${err.message}`);
       } finally {
         setLoading(false);
