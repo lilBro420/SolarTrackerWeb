@@ -10,11 +10,22 @@ import {
   Legend,
 } from 'chart.js';
 
-// Registrar los componentes de Chart.js
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
-// Define la URL base de tu API en Render
+// URL base del backend en Render
 const RENDER_API_URL = 'https://solartrackerweb.onrender.com';
+
+// Mapeo de direcciones largas a abreviaciones
+const DIRECCION_TRADUCCION = {
+  'Norte': 'N',
+  'Noreste': 'NE',
+  'Este': 'E',
+  'Sureste': 'SE',
+  'Sur': 'S',
+  'Suroeste': 'SW',
+  'Oeste': 'W',
+  'Noroeste': 'NW',
+};
 
 export default function RealtimeDirectionChart() {
   const [chartData, setChartData] = useState({
@@ -38,7 +49,7 @@ export default function RealtimeDirectionChart() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        console.log('📡 Solicitando datos de dirección cardinal...');
+        console.log(' Solicitando datos de dirección cardinal...');
         const response = await fetch(`${RENDER_API_URL}/api/panel-solar/ultimos-movimientos?limit=5`);
 
         if (!response.ok) {
@@ -47,20 +58,23 @@ export default function RealtimeDirectionChart() {
         }
 
         const data = await response.json();
-        console.log('✅ Datos recibidos desde la API:', data);
+        console.log(' Datos recibidos desde la API:', data);
 
         const labels = data.map(item => {
           const date = new Date(item.fecha_hora);
-          const timeStr = date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-          return timeStr;
+          return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
         });
 
-        const directionData = data.map(item => item.direccion_cardinal);
-        console.log('📊 Etiquetas (fechas):', labels);
-        console.log('📍 Direcciones cardinales:', directionData);
+        const directionData = data.map(item => {
+          const original = item.direccion_cardinal?.trim();
+          return DIRECCION_TRADUCCION[original] || 'N/A';
+        });
+
+        console.log(' Etiquetas (fechas):', labels);
+        console.log(' Direcciones cardinales:', directionData);
 
         setChartData({
-          labels: labels,
+          labels,
           datasets: [
             {
               label: 'Dirección Cardinal',
@@ -81,17 +95,13 @@ export default function RealtimeDirectionChart() {
       }
     };
 
-    fetchData(); // Ejecutar al montar
-
-    const intervalId = setInterval(fetchData, 5000); // Actualizar cada 5 segundos
-
+    fetchData();
+    const intervalId = setInterval(fetchData, 5000);
     return () => clearInterval(intervalId);
   }, []);
 
   const options = {
-    animation: {
-      duration: 0
-    },
+    animation: { duration: 0 },
     elements: {
       point: {
         radius: 5,
@@ -120,10 +130,7 @@ export default function RealtimeDirectionChart() {
       },
       y: {
         type: 'category',
-        labels: [
-          'N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE',
-          'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'
-        ],
+        labels: ['N', 'NE', 'E', 'SE', 'S', 'SW', 'W', 'NW'],
         ticks: { color: '#000' },
         title: {
           display: true,
