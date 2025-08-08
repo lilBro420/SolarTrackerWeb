@@ -1,7 +1,7 @@
 import React from 'react';
 import Direccion from '../componentes/Direccion';
 import Estado from '../componentes/Estado';
-import Ultimos from '../componentes/Estado';
+import Ultimos from '../componentes/Ultimos';
 import SunPathChart from '../componentes/SunPathChart';
 import MonthlySunPathChart from '../componentes/MonthlySunPathChart';
 import '../styles/solarPanel.css';
@@ -24,8 +24,7 @@ function Inicio() {
 
         {/* Lado Derecho: Trayectoria solar */}
         <div className="right-charts">
-          <div className="chart-box"><SunPathChart /></div>
-          <div className="chart-box"><MonthlySunPathChart /></div>
+         {/* aqui van las demas graficas*/}
         </div>
       </div>
     </div>
