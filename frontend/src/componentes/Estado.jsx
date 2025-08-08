@@ -16,6 +16,8 @@ export default function Estado() {
       setLoading(true);
       try {
         // Usamos la URL de tu API para el estado actual.
+        // Asumiendo que esta API devuelve un objeto limpio como:
+        // { "estado": "activo", "inicio": "...", "fin": null }
         const response = await fetch('https://solartrackerweb.onrender.com/api/tracker-estado-actual');
 
         if (!response.ok) {

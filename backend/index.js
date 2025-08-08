@@ -447,45 +447,58 @@ app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
 // --- Último movimiento del tracker ---
 
 app.get('/api/panel-solar/ultimo-movimiento', (req, res) => {
-  const limit = parseInt(req.query.limit) || 1;
+  // Aquí deberías conectar con tu base de datos MySQL
+  // y ejecutar la siguiente consulta SQL:
 
-  if (isNaN(limit) || limit <= 0 || limit > 100) {
-    return res.status(400).json({ error: 'El parámetro necesita ser "limit" debe ser un número positivo y menor o igual a 100.' });
-  }
+  const sql = `
+    SELECT
+      direccion_cardinal
+    FROM Solar_Tracker
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
+  `;
 
-  const sql = `
-    SELECT
-      direccion_cardinal
-    FROM Solar_Tracker
-    LIMIT 1;
-  `;
+  // Suponiendo que tienes un manejador de resultados:
+  // connection.query(sql, (error, results) => {
+  //   if (error) {
+  //     return res.status(500).json({ error: error.message });
+  //   }
+  //   if (results.length > 0) {
+  //     // Envías solo el primer resultado, que es un objeto con la dirección
+  //     res.json(results[0]);
+  //   } else {
+  //     res.status(404).json({ message: "No se encontraron datos." });
+  //   }
+  // });
+});
 
 // --- Estado actual del tracker ---
 app.get('/api/tracker-estado-actual', (req, res) => {
-  const query = `
-    SELECT estado, fecha_hora_inicio, fecha_hora_fin
-    FROM tracker_status
-    ORDER BY fecha_hora_inicio DESC
-    LIMIT 1
-  `;
+  // Aquí deberías conectar con tu base de datos MySQL
+  // y ejecutar la siguiente consulta SQL:
 
-  pool.query(query, (err, results) => {
-    if (err) {
-      console.error(' Error al consultar el estado actual:', err);
-      return res.status(500).json({ error: 'Error al obtener el estado actual.' });
-    }
+  const sql = `
+    SELECT
+      estado,
+      fecha_hora_inicio as inicio,
+      fecha_hora_fin as fin
+    FROM tracker_status
+    ORDER BY fecha_hora_inicio DESC
+    LIMIT 1;
+  `;
 
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'No hay estados registrados.' });
-    }
-
-    const estadoActual = results[0];
-    res.json({
-      estado: estadoActual.estado,
-      inicio: estadoActual.fecha_hora_inicio,
-      fin: estadoActual.fecha_hora_fin
-    });
-  });
+  // Suponiendo que tienes un manejador de resultados:
+  // connection.query(sql, (error, results) => {
+  //   if (error) {
+  //     return res.status(500).json({ error: error.message });
+  //   }
+  //   if (results.length > 0) {
+  //     // Envías solo el primer resultado, que es un objeto con el estado
+  //     res.json(results[0]);
+  //   } else {
+  //     res.status(404).json({ message: "No se encontraron datos." });
+  //   }
+  // });
 });
 
 
@@ -626,5 +639,4 @@ app.post('/api/verificar-token', (req, res) => {
     console.log(' Token válido y no caducado para el correo, estimado:', correo);
     res.json({ valid: true, message: 'Token válido.' });
   });
-});
 });
