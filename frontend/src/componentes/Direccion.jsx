@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 
+// Este componente muestra la última dirección cardinal del tracker.
 // Se asume que Tailwind CSS está disponible para el estilo.
 export default function Direccion() {
   const [ultimaDireccion, setUltimaDireccion] = useState(null);
@@ -24,11 +25,9 @@ export default function Direccion() {
         const data = await response.json();
         console.log("Datos de la dirección recibidos:", data);
 
-        // Verificamos si los datos son un array y accedemos al primer elemento,
-        // de lo contrario, asumimos que es un objeto directamente.
         let direccion = null;
         if (Array.isArray(data) && data.length > 0) {
-          direccion = data[0].direccion_cardinal;
+          direccion = data[0]?.direccion_cardinal;
         } else if (data && data.direccion_cardinal) {
           direccion = data.direccion_cardinal;
         }
@@ -39,14 +38,12 @@ export default function Direccion() {
           return;
         }
         
-        // --- Corrección para eliminar la hora ---
         // Asumimos que la hora y la dirección están separadas por un ' - '.
         // Separamos la cadena y tomamos solo la primera parte.
         const direccionSinHora = direccion.split(' - ')[0];
 
         // Si se encuentra la dirección, la establecemos en el estado.
         setUltimaDireccion(direccionSinHora);
-        // --- Fin de la corrección ---
 
       } catch (err) {
         console.error("Error al cargar la dirección del tracker:", err);
@@ -66,10 +63,10 @@ export default function Direccion() {
 
   // Si hay datos, los mostramos.
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 m-4 w-full md:max-w-md">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-full h-full flex flex-col justify-center items-center">
       <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Última Dirección del Tracker</h2>
       {ultimaDireccion && (
-        <div className="p-3 bg-gray-100 rounded-md text-center">
+        <div className="p-3 bg-gray-100 rounded-md text-center flex-grow flex items-center justify-center">
           <p className="text-4xl font-bold text-blue-600">
             {ultimaDireccion}
           </p>

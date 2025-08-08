@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 
+// Este componente muestra el estado actual del tracker y las horas asociadas.
+// Se asume que Tailwind CSS está disponible para el estilo.
 export default function Estado() {
   const [estadoData, setEstadoData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -50,7 +52,7 @@ export default function Estado() {
 
   // Renderizamos los datos si están disponibles.
   return (
-    <div className="bg-white rounded-lg shadow-lg p-6 m-4 w-full md:max-w-md">
+    <div className="bg-white rounded-lg shadow-lg p-6 w-full h-full flex flex-col justify-center">
       <h2 className="text-2xl font-bold mb-4 text-center text-gray-800">Estado Actual del Tracker</h2>
       {estadoData && (
         <div className="space-y-4">
