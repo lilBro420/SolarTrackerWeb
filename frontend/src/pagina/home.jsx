@@ -22,7 +22,7 @@ function Inicio() {
           <div className="chart-box"><Ultimos /></div>
         </div>
 
-        {/* Lado Derecho: Trayectoria solar */}
+        {/* Lado Derecho: Trayectoria solar pa */}
         <div className="right-charts">
          {/* aqui van las demas graficas*/}
         </div>
