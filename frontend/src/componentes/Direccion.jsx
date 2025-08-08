@@ -13,7 +13,7 @@ export default function Direccion() {
       setError(null);
       setLoading(true);
       try {
-    
+
         const response = await fetch('https://solartrackerweb.onrender.com/api/tracker-info');
 
        
@@ -22,32 +22,29 @@ export default function Direccion() {
           throw new Error(`Error de red: ${response.status}, mensaje: ${errorText}`);
         }
 
-  
         const data = await response.json();
         console.log("Datos del tracker recibidos:", data);
 
-     
         if (!data || Object.keys(data).length === 0) {
           setMessage("No hay datos recientes del tracker disponibles.");
           setTrackerData(null);
           return;
         }
+
         setTrackerData(data);
 
       } catch (err) {
-
+       
         console.error("Error al cargar datos del tracker:", err);
         setError("Error: " + (err.message || "No se pudieron cargar los datos del tracker."));
       } finally {
-        // Finalizamos la carga.
+        
         setLoading(false);
       }
     };
 
-    
     fetchTrackerInfo();
   }, []); 
-
 
   if (loading) return <div className="p-4 text-center text-gray-700">Cargando estado del tracker...</div>;
   if (error) return <div className="p-4 text-center text-red-500">Error: {error}</div>;
