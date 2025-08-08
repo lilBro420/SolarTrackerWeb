@@ -24,7 +24,6 @@ export default function Direccion() {
         const data = await response.json();
         console.log("Datos de la dirección recibidos:", data);
 
-        // --- Corrección clave aquí ---
         // Verificamos si los datos son un array y accedemos al primer elemento,
         // de lo contrario, asumimos que es un objeto directamente.
         let direccion = null;
@@ -34,15 +33,19 @@ export default function Direccion() {
           direccion = data.direccion_cardinal;
         }
 
-        // Si no se encuentra la dirección en ninguno de los formatos.
         if (!direccion) {
           setMessage("No hay datos recientes del tracker disponibles.");
           setUltimaDireccion(null);
           return;
         }
+        
+        // --- Corrección para eliminar la hora ---
+        // Asumimos que la hora y la dirección están separadas por un ' - '.
+        // Separamos la cadena y tomamos solo la primera parte.
+        const direccionSinHora = direccion.split(' - ')[0];
 
         // Si se encuentra la dirección, la establecemos en el estado.
-        setUltimaDireccion(direccion);
+        setUltimaDireccion(direccionSinHora);
         // --- Fin de la corrección ---
 
       } catch (err) {
