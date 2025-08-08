@@ -15,7 +15,7 @@ function Inicio() {
       </div>
 
       <div className="layout">
-        {/* Lado Izquierdo: Energía */}
+        {/* Lado Izquierdo: energía */}
         <div className="left-charts">
           <div className="chart-box"><Direccion /></div>
           <div className="chart-box"><Estado /></div>
