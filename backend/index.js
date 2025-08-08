@@ -457,7 +457,7 @@ app.get('/api/panel-solar/ultimo-movimiento', (req, res) => {
     SELECT
       direccion_cardinal
     FROM Solar_Tracker
-    LIMIT ?;
+    LIMIT 1;
   `;
 
 // --- Estado actual del tracker ---
