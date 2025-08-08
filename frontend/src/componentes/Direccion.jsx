@@ -15,7 +15,7 @@ export default function Direccion() {
       try {
         // La URL de tu API para obtener los últimos movimientos.
         // Usamos un límite de 1 para obtener solo el último registro.
-        const response = await fetch('https://solartrackerweb.onrender.com/api/panel-solar/ultimos-movimientos?limit=1');
+        const response = await fetch('https://solartrackerweb.onrender.com/api/panel-solar/ultimo-movimiento');
 
         // Manejamos errores si la respuesta no es exitosa.
         if (!response.ok) {

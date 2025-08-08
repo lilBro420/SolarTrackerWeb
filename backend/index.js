@@ -412,7 +412,7 @@ app.get('/api/tracker-horas-por-dia', (req, res) => {
 });
 
 // --- Últimos movimientos del tracker ---
-// --- Últimos movimientos del tracker ---
+
 app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
   const limit = parseInt(req.query.limit) || 10;
 
@@ -442,6 +442,23 @@ app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
     res.json(results.reverse());
   });
 });
+
+//direccion ultima:
+// --- Último movimiento del tracker ---
+
+app.get('/api/panel-solar/ultimo-movimiento', (req, res) => {
+  const limit = parseInt(req.query.limit) || 1;
+
+  if (isNaN(limit) || limit <= 0 || limit > 100) {
+    return res.status(400).json({ error: 'El parámetro necesita ser "limit" debe ser un número positivo y menor o igual a 100.' });
+  }
+
+  const sql = `
+    SELECT
+      direccion_cardinal
+    FROM Solar_Tracker
+    LIMIT ?;
+  `;
 
 // --- Estado actual del tracker ---
 app.get('/api/tracker-estado-actual', (req, res) => {
@@ -609,4 +626,5 @@ app.post('/api/verificar-token', (req, res) => {
     console.log(' Token válido y no caducado para el correo, estimado:', correo);
     res.json({ valid: true, message: 'Token válido.' });
   });
+});
 });
