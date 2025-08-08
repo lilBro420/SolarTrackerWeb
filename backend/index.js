@@ -63,7 +63,7 @@ const transporter = nodemailer.createTransport({
 });
 
 
-// --- FUNCIONES DE VALIDACIÓN ---
+// --- FUNCIONES DE VALIDACION ---
 const isValidEmail = (email) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 const isValidPassword = (password) => password.length >= 6;
 const isValidName = (name) => {
@@ -86,7 +86,7 @@ app.post('/api/login', (req, res) => {
   const sql = 'SELECT idUsuario, nombre, correo, contrasena FROM usuario WHERE correo = ? LIMIT 1';
   pool.query(sql, [correo], async (err, results) => {
     if (err) {
-      console.error('❌ Error en consulta SQL:', err);
+      console.error(' Error en consulta SQL:', err);
       return res.status(500).json({ error: 'Error del servidor' });
     }
 
@@ -229,12 +229,12 @@ app.post('/api/change-password', (req, res) => {
   const sqlToken = 'SELECT token, token_expira FROM usuario WHERE correo = ? LIMIT 1';
   pool.query(sqlToken, [correo], async (err, results) => {
     if (err) {
-      console.error('❌ Error al consultar token para cambio de contraseña:', err);
+      console.error(' Error al consultar token para cambio de contraseña:', err);
       return res.status(500).json({ error: 'Error del servidor.' });
     }
 
     if (results.length === 0) {
-      console.warn('❌ Usuario no encontrado al intentar cambiar contraseña.');
+      console.warn(' Usuario no encontrado al intentar cambiar contraseña.');
       return res.status(404).json({ error: 'Usuario no encontrado.' });
     }
 
@@ -249,7 +249,7 @@ app.post('/api/change-password', (req, res) => {
     }
 
     if (storedToken !== String(token).trim()) {
-      console.warn('❌ Token inválido o no coincide para el correo proporcionado.');
+      console.warn(' Token inválido o no coincide para el correo proporcionado.');
       return res.status(401).json({ error: 'Token inválido.' });
     }
 
@@ -262,20 +262,20 @@ app.post('/api/change-password', (req, res) => {
       const updateSql = 'UPDATE usuario SET contrasena = ?, token = NULL, token_expira = NULL WHERE correo = ?';
       pool.query(updateSql, [hashedNewPassword, correo], (updateErr, result) => {
         if (updateErr) {
-          console.error('❌ Error al actualizar contraseña:', updateErr);
+          console.error(' Error al actualizar contraseña:', updateErr);
           return res.status(500).json({ error: 'Error al actualizar la contraseña.' });
         }
 
         if (result.affectedRows === 0) {
-          console.warn('❌ Usuario no encontrado al actualizar la contraseña después de validación.');
+          console.warn(' Usuario no encontrado al actualizar la contraseña después de validación.');
           return res.status(404).json({ error: 'Usuario no encontrado.' });
         }
 
-        console.log('✅ Contraseña actualizada exitosamente y token limpiado.');
+        console.log(' Contraseña actualizada exitosamente y token limpiado.');
         res.json({ message: 'Contraseña actualizada correctamente.' });
       });
     } catch (bcryptErr) {
-      console.error('❌ Error interno al generar hash para nueva contraseña:', bcryptErr);
+      console.error(' Error interno al generar hash para nueva contraseña:', bcryptErr);
       return res.status(500).json({ error: 'Error interno del servidor.' });
     }
   });
@@ -341,85 +341,85 @@ app.get('/api/reportes-semanales', (req, res) => {
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
-  console.log(`🌐 Servidor corriendo en http://localhost:${PORT}`);
+  console.log(` Servidor corriendo en http://localhost:${PORT}`);
 });
 
 //GRAFICAS
-
-// --- ENERGIA GENERADA DIARIA (Para EnergyDayChart) ---
-app.get('/api/panel-solar/energia-diaria', (req, res) => {
-  const { date } = req.query;
-  const targetDate = date ? date : new Date().toISOString().slice(0, 10);
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
-    return res.status(400).json({ error: 'Formato de fecha inválido. Use YYYY-MM-DD.' });
-  }
-
-  const sql = `
+// --- Uno ---
+app.get('/api/tracker-info', (req, res) => {
+  const query = `
     SELECT
-        DATE_FORMAT(fecha_hora, '%H:00') as hora,
-        -- Usamos CAST para asegurar que energia_wh sea un número flotante
-        CAST(SUM(energia) AS DECIMAL(10,4)) as energia_wh
-    FROM panelSolar
-    WHERE DATE(fecha_hora) = ?
-    AND TIME(fecha_hora) >= '06:00:00' AND TIME(fecha_hora) <= '18:00:00'
-    GROUP BY hora
-    ORDER BY hora ASC;
+      fecha_hora,
+      direccion_cardinal
+    FROM Solar_Tracker
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
   `;
 
-  pool.query(sql, [targetDate], (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
-      console.error(' Error al obtener energía diaria:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener energía diaria.' });
+      console.error('Error al obtener datos del tracker:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener la información del tracker.' });
     }
-    console.log(` Datos de energía diaria para ${targetDate} obtenidos.`);
-    res.json(results);
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No hay datos del tracker disponibles.' });
+    }
+
+    const lastRecord = results[0];
+    const lastTimestamp = new Date(lastRecord.fecha_hora);
+    const currentTime = new Date();
+    const minutesDiff = (currentTime - lastTimestamp) / (1000 * 60);
+
+    let estado = 'inactivo';
+    if (minutesDiff < 2) { // Si el último registro tiene menos de 15 minutos, está activo
+      estado = 'activo';
+    }
+
+    res.json({
+      estado_actual: estado,
+      direccion_cardinal: lastRecord.direccion_cardinal,
+      ultima_actualizacion: lastRecord.fecha_hora
+    });
   });
 });
 
-// --- CONSUMO ENERGETICO DIARIO (Para EnergyUseChart) ---
-app.get('/api/panel-solar/consumo-diario', (req, res) => {
-  const { date } = req.query;
-  const targetDate = date ? date : new Date().toISOString().slice(0, 10);
-
-  if (!/^\d{4}-\d{2}-\d{2}$/.test(targetDate)) {
-    return res.status(400).json({ error: 'Formato de fecha inválido. Use YYYY-MM-DD.' });
-  }
-
-  const sql = `
-    SELECT
-        DATE_FORMAT(fecha_hora, '%H:00') as hora,
-        -- Usamos CAST para asegurar que consumo_wh sea un número flotante
-        CAST(SUM(consumo) AS DECIMAL(10,4)) as consumo_wh
-    FROM panelSolar
-    WHERE DATE(fecha_hora) = ?
-    GROUP BY hora
-    ORDER BY hora ASC;
+// --- Dos ---
+app.get('/api/tracker-horas-por-dia', (req, res) => {
+  const today = new Date().toISOString().slice(0, 10);
+  const query = `
+    SELECT 
+      estado,
+      SUM(TIMESTAMPDIFF(SECOND, fecha_hora_inicio, IFNULL(fecha_hora_fin, NOW()))) AS total_segundos
+    FROM tracker_status
+    WHERE DATE(fecha_hora_inicio) = ?
+    GROUP BY estado;
   `;
 
-  pool.query(sql, [targetDate], (err, results) => {
+  pool.query(query, [today], (err, results) => {
     if (err) {
-      console.error(' Error al obtener consumo diario:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener consumo diario.' });
+      console.error('Error al calcular las horas:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener las horas de estado.' });
     }
-    console.log(` Datos de consumo diario para ${targetDate} obtenidos.`);
-    res.json(results);
+    
+    const horas = { activo: 0, inactivo: 0, mantenimiento: 0 };
+    results.forEach(row => {
+      horas[row.estado] = (row.total_segundos / 3600).toFixed(2); // Convertir segundos a horas
+    });
+
+    res.json(horas);
   });
 });
 
-//TRES
+// --- Últimos movimientos del tracker ---
+// --- Últimos movimientos del tracker ---
 app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
-  const limit = parseInt(req.query.limit) || 5;
+  const limit = parseInt(req.query.limit) || 10;
 
-  console.log('🔍 Llamada recibida a /api/panel-solar/ultimos-movimientos con limit =', limit);
-
-  // Validar límite
   if (isNaN(limit) || limit <= 0 || limit > 100) {
-    console.warn(' Límite inválido:', limit);
     return res.status(400).json({ error: 'El parámetro "limit" debe ser un número positivo y menor o igual a 100.' });
   }
 
-  // Consulta
   const sql = `
     SELECT
       fecha_hora,
@@ -429,79 +429,62 @@ app.get('/api/panel-solar/ultimos-movimientos', (req, res) => {
     LIMIT ?;
   `;
 
-  console.log(' Ejecutando consulta SQL:\n', sql);
-  
   pool.query(sql, [limit], (err, results) => {
     if (err) {
-      console.error(' Error al ejecutar la consulta SQL:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener datos en tiempo real.' });
+      console.error('Error al ejecutar la consulta SQL:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener datos de movimientos.' });
     }
 
-    console.log(` Resultados obtenidos (${results.length}):`, results);
-
     if (results.length === 0) {
-      console.log(' No hay datos disponibles.');
       return res.status(404).json({ message: 'No hay datos de movimientos recientes disponibles.' });
     }
 
-    const sortedResults = results.reverse(); // De más viejo a más nuevo
-    console.log(' Resultados ordenados (de más viejo a más nuevo):', sortedResults);
-
-    res.json(sortedResults);
+    res.json(results.reverse());
   });
 });
 
-//CUATRO
-// --- ESTADO OPERACIONAL DEL PANEL (Para BatteryChart) ---
-app.get('/api/reportes/estado-panel', (req, res) => {
-  const sql = `
-    SELECT
-        horas_activo_panel,
-        horas_inactivo_panel,
-        horas_mantenimiento_panel
-    FROM reportes
-    ORDER BY fecha_generacion_reporte DESC
-    LIMIT 1;
+// --- Estado actual del tracker ---
+app.get('/api/tracker-estado-actual', (req, res) => {
+  const query = `
+    SELECT estado, fecha_hora_inicio, fecha_hora_fin
+    FROM tracker_status
+    ORDER BY fecha_hora_inicio DESC
+    LIMIT 1
   `;
 
-  pool.query(sql, (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
-      console.error('Error al obtener estado operacional del panel:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener el estado operacional del panel.' });
+      console.error(' Error al consultar el estado actual:', err);
+      return res.status(500).json({ error: 'Error al obtener el estado actual.' });
     }
 
     if (results.length === 0) {
-      console.log(' No hay datos de reportes para el estado del panel.');
-      return res.status(404).json({ message: 'No hay datos de estado del panel disponibles.' });
+      return res.status(404).json({ message: 'No hay estados registrados.' });
     }
 
-    const latestReport = results[0];
-    const totalHoras = latestReport.horas_activo_panel + latestReport.horas_inactivo_panel + latestReport.horas_mantenimiento_panel;
-    const activoPct = totalHoras > 0 ? (latestReport.horas_activo_panel / totalHoras) * 100 : 0;
-    const inactivoMantenimientoPct = totalHoras > 0 ? ((latestReport.horas_inactivo_panel + latestReport.horas_mantenimiento_panel) / totalHoras) * 100 : 0;
+    const estadoActual = results[0];
     res.json({
-      horas_activo: latestReport.horas_activo_panel,
-      horas_inactivo: latestReport.horas_inactivo_panel,
-      horas_mantenimiento: latestReport.horas_mantenimiento_panel,
-      porcentaje_activo: activoPct,
-      porcentaje_inactivo_mantenimiento: inactivoMantenimientoPct
+      estado: estadoActual.estado,
+      inicio: estadoActual.fecha_hora_inicio,
+      fin: estadoActual.fecha_hora_fin
     });
   });
 });
 
 
-// Verificar si el correo está registrado
+
+// Verificar correo registrado
 app.post('/api/verificar-correo', (req, res) => {
   const { correo } = req.body;
-  console.log('🔄 Recibida solicitud para verificar correo:', correo);
+  console.log(' Recibida solicitud para verificar correo:', correo);
 
   if (!correo) {
-    console.warn('⚠️ Campo de correo requerido en verificar-correo.');
+    console.warn(' Campo de correo requerido en verificar-correo.');
     return res.status(400).json({ error: 'Campo de correo requerido.' });
   }
 
   if (!isValidEmail(correo)) {
-    console.warn('⚠️ Formato de correo inválido en verificar-correo:', correo);
+    console.warn(' Formato de correo inválido en verificar-correo:', correo);
     return res.status(400).json({ error: 'Formato de correo inválido.' });
   }
 
@@ -509,16 +492,16 @@ app.post('/api/verificar-correo', (req, res) => {
 
   pool.query(sql, [correo], (err, results) => {
     if (err) {
-      console.error('❌ Error en verificación de correo SQL:', err);
+      console.error(' Error en verificación de correo SQL:', err);
       return res.status(500).json({ error: 'Error del servidor.' });
     }
 
     if (results.length === 0) {
-      console.log('🚫 Correo no registrado:', correo);
+      console.log(' Correo no registrado:', correo);
       return res.status(404).json({ exists: false, message: 'El correo no está registrado.' });
     }
 
-    console.log('✅ Correo registrado:', correo);
+    console.log(' Correo registrado:', correo);
     res.json({ exists: true, message: 'Correo registrado.' });
   });
 });
@@ -526,10 +509,10 @@ app.post('/api/verificar-correo', (req, res) => {
 // --- ENVIAR CORREO CON NODEMAILER ---
 app.post('/api/generar-token', (req, res) => {
   const { correo } = req.body;
-  console.log('🔄 Recibida solicitud para generar token para correo:', correo);
+  console.log(' Recibida solicitud para generar token para correo:', correo);
 
   if (!correo) {
-    console.warn('⚠️ Correo requerido para generar token.');
+    console.warn(' Correo requerido para generar token.');
     return res.status(400).json({ error: 'Correo requerido.' });
   }
 
@@ -541,12 +524,12 @@ app.post('/api/generar-token', (req, res) => {
   const sql = 'UPDATE usuario SET token = ?, token_expira = ? WHERE correo = ?';
   pool.query(sql, [token, expira, correo], async (err, result) => { 
     if (err) {
-      console.error('❌ Error al guardar token:', err);
+      console.error(' Error al guardar token:', err);
       return res.status(500).json({ error: 'No se pudo guardar el token.' });
     }
 
     if (result.affectedRows === 0) {
-      console.warn('🚫 Correo no encontrado al intentar guardar token:', correo);
+      console.warn(' Correo no encontrado al intentar guardar token:', correo);
       return res.status(404).json({ error: 'Correo no encontrado.' });
     }
 
@@ -582,7 +565,7 @@ app.post('/api/generar-token', (req, res) => {
   });
 });
 
-// --- MODIFICACIÓN: Verificar si el token es válido y no ha caducado (SOLO VALIDACIÓN) ---
+//  Verificar token y no ha caducado  ---
 app.post('/api/verificar-token', (req, res) => {
   const { correo, token } = req.body;
 
@@ -614,7 +597,7 @@ app.post('/api/verificar-token', (req, res) => {
     const ahora = new Date();
 
     if (ahora > tokenExpira) {
-      console.warn('⏳ Token caducado para el correo:', correo);
+      console.warn(' Token caducado para el correo:', correo);
       return res.status(401).json({ valid: false, message: 'El token ha expirado.' });
     }
 

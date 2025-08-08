@@ -1,7 +1,7 @@
 import React from 'react';
-import BatteryChart from '../componentes/BatteryChart';
-import EnergyDayChart from '../componentes/EnergyDayChart';
-import EnergyUseChart from '../componentes/EnergyUseChart';
+import Direccion from '../componentes/Direccion';
+import Estado from '../componentes/Estado';
+import Ultimos from '../componentes/Estado';
 import SunPathChart from '../componentes/SunPathChart';
 import MonthlySunPathChart from '../componentes/MonthlySunPathChart';
 import '../styles/solarPanel.css';
@@ -17,9 +17,9 @@ function Inicio() {
       <div className="layout">
         {/* Lado Izquierdo: Energía */}
         <div className="left-charts">
-          <div className="chart-box"><BatteryChart /></div>
-          <div className="chart-box"><EnergyDayChart /></div>
-          <div className="chart-box"><EnergyUseChart /></div>
+          <div className="chart-box"><Direccion /></div>
+          <div className="chart-box"><Estado /></div>
+          <div className="chart-box"><Ultimos /></div>
         </div>
 
         {/* Lado Derecho: Trayectoria solar */}
