@@ -501,6 +501,66 @@ app.get('/api/tracker-estado-actual', (req, res) => {
   // });
 });
 
+//graficas bateria
+// --- Endpoint para obtener el último porcentaje de la batería ---
+app.get('/api/bateria/porcentaje', (req, res) => {
+  const query = `
+    SELECT
+      porcentaje,
+      fecha_hora
+    FROM bateria
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
+  `;
+
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener el porcentaje de la batería:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener el porcentaje de la batería.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
+    }
+
+    const lastRecord = results[0];
+    res.json({
+      porcentaje: lastRecord.porcentaje,
+      ultima_actualizacion: lastRecord.fecha_hora
+    });
+  });
+});
+
+// --- Endpoint para obtener el último voltaje de la batería ---
+app.get('/api/bateria/voltaje', (req, res) => {
+  const query = `
+    SELECT
+      voltaje,
+      fecha_hora
+    FROM bateria
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
+  `;
+
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener el voltaje de la batería:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener el voltaje de la batería.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
+    }
+
+    const lastRecord = results[0];
+    res.json({
+      voltaje: lastRecord.voltaje,
+      ultima_actualizacion: lastRecord.fecha_hora
+    });
+  });
+});
+
+
 
 
 // Verificar correo registrado
