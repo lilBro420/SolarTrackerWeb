@@ -569,7 +569,7 @@ app.get('/api/bateria/porcentaje', (req, res) => {
       fecha_hora
     FROM bateria
     ORDER BY fecha_hora DESC
-    LIMIT 1;
+    LIMIT 20;  // <-- CAMBIO AQUÍ: Ahora obtendrá los últimos 20 registros
   `;
 
   pool.query(query, (err, results) => {
@@ -582,11 +582,10 @@ app.get('/api/bateria/porcentaje', (req, res) => {
       return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    const lastRecord = results[0];
-    res.json({
-      porcentaje: lastRecord.porcentaje,
-      ultima_actualizacion: lastRecord.fecha_hora
-    });
+    // El resultado ya es un array, se puede enviar directamente.
+    // También es buena práctica revertirlo para que la cronología en el gráfico sea correcta
+    // (del más antiguo al más reciente).
+    res.json(results.reverse()); 
   });
 });
 
@@ -598,7 +597,7 @@ app.get('/api/bateria/voltaje', (req, res) => {
       fecha_hora
     FROM bateria
     ORDER BY fecha_hora DESC
-    LIMIT 1;
+    LIMIT 20; 
   `;
 
   pool.query(query, (err, results) => {
@@ -611,11 +610,10 @@ app.get('/api/bateria/voltaje', (req, res) => {
       return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    const lastRecord = results[0];
-    res.json({
-      voltaje: lastRecord.voltaje,
-      ultima_actualizacion: lastRecord.fecha_hora
-    });
+    // El resultado ya es un array, se puede enviar directamente.
+    // Es buena práctica revertirlo para que la cronología sea correcta
+    // (del más antiguo al más reciente).
+    res.json(results.reverse());
   });
 });
 

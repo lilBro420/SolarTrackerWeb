@@ -19,13 +19,14 @@ function Home() {
         <div className="left-charts">
           <div className="chart-box"><Direccion /></div>
           <div className="chart-box"><Estado /></div>
-          <div className="chart-box"><Ultimos /></div>
+          {<div className="chart-box"><Ultimos /></div>}
         </div>
 
         {/* Lado Derecho: gráficos de la batería (porcentaje y voltaje) */}
         <div className="right-charts">
           <div className="chart-box"><Porcentaje /></div>
-          <Voltaje />
+          <div className="chart-box"><Voltaje /></div>
+          
         </div>
       </div>
     </div>
