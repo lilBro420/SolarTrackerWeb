@@ -15,10 +15,10 @@ ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip,
 
 /**
  * Componente de React para mostrar un gráfico del porcentaje de la batería a lo largo del tiempo.
- * Se asume que existe un endpoint de backend en `/api/bateria/historial-diario` que devuelve
+ * Se asume que existe un endpoint de backend en `/api/bateria/porcentaje` que devuelve
  * los datos de porcentaje y fecha/hora.
  */
-export default function BatteryChart() {
+export default function Porcentaje() {
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -44,15 +44,12 @@ export default function BatteryChart() {
       setError(null);
       setLoading(true);
       try {
-        // Asumimos un endpoint para obtener el historial diario de la batería
-        // En tu backend, necesitarías un endpoint que devuelva un array de objetos como:
-        // [{ porcentaje: 95.5, fecha_hora: '2023-10-27T10:00:00Z' }, ...]
         const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/porcentaje`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const historicalData = await response.json();
-        console.log("[BatteryChart] Datos de batería recibidos:", historicalData);
+        console.log("[Porcentaje] Datos de batería recibidos:", historicalData);
 
         if (historicalData.length === 0) {
           setMessage("No hay datos de batería disponibles para graficar.");
@@ -88,7 +85,7 @@ export default function BatteryChart() {
         });
 
       } catch (err) {
-        console.error("[BatteryChart] Error al cargar datos de la batería:", err);
+        console.error("[Porcentaje] Error al cargar datos de la batería:", err);
         setError("Error: " + (err.message || "No se pudieron cargar los datos de la batería."));
       } finally {
         setLoading(false);
@@ -143,7 +140,7 @@ export default function BatteryChart() {
 
   return (
     <div style={{ height: '310px', minHeight: '180px' }}>
-      <h2>Historial de Batería</h2>
+      <h2>Historial de Porcentaje</h2>
       <Line data={chartData} options={options} />
     </div>
   );

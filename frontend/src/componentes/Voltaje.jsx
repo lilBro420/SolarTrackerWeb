@@ -14,7 +14,7 @@ import {
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
 
-export default function VoltageChart() {
+export default function Voltaje() {
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
@@ -44,7 +44,7 @@ export default function VoltageChart() {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const historicalData = await response.json();
-        console.log("[VoltageChart] Datos de voltaje recibidos:", historicalData);
+        console.log("[Voltaje] Datos de voltaje recibidos:", historicalData);
 
         if (historicalData.length === 0) {
           setMessage("No hay datos de voltaje disponibles para graficar.");
@@ -80,7 +80,7 @@ export default function VoltageChart() {
         });
 
       } catch (err) {
-        console.error("[VoltageChart] Error al cargar datos de voltaje:", err);
+        console.error("[Voltaje] Error al cargar datos de voltaje:", err);
         setError("Error: " + (err.message || "No se pudieron cargar los datos de voltaje de la batería."));
       } finally {
         setLoading(false);
