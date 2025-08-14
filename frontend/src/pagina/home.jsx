@@ -24,7 +24,6 @@ function Home() {
 
         {/* Lado Derecho: gráficos de la batería (porcentaje y voltaje) */}
         <div className="right-charts">
-          <div className="chart-box"><Direccion /></div>
           <div className="chart-box"><Porcentaje /></div>
           <div className="chart-box"><Voltaje /></div>
           
