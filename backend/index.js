@@ -530,6 +530,7 @@ app.get('/api/bateria/porcentaje', (req, res) => {
   });
 });
 // --- Endpoint para obtener el porcentaje de la batería (historial) ---
+// --- Endpoint para obtener el porcentaje de la batería (historial) ---
 app.get('/api/bateria/porcentaje', (req, res) => {
   const query = `
     SELECT
@@ -543,15 +544,16 @@ app.get('/api/bateria/porcentaje', (req, res) => {
   pool.query(query, (err, results) => {
     if (err) {
       console.error('Error al obtener el porcentaje de la batería:', err);
+      // Devuelve el error 500 del servidor
       return res.status(500).json({ error: 'Error del servidor al obtener el porcentaje de la batería.' });
     }
 
     if (results.length === 0) {
+      // Si no hay datos, devuelve un mensaje 404
       return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    // El array de resultados viene del más reciente al más antiguo.
-    // Lo revertimos para que el gráfico se muestre en orden cronológico (de más antiguo a más reciente).
+    // Devuelve el array de resultados completo y en orden cronológico (revertido)
     res.json(results.reverse());
   });
 });
