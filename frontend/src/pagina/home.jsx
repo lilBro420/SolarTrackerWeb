@@ -24,6 +24,8 @@ function Inicio() {
 
         {/* Lado Derecho: Trayectoria solar pa */}
         <div className="right-charts">
+          <div className="chart-box"><MonthlySunPathChart /></div>
+          <div className="chart-box"><SunPathChart /></div>
          {/* aqui van las demas graficas*/}
         </div>
       </div>

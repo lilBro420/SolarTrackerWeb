@@ -10,25 +10,22 @@ import {
   Legend,
 } from 'chart.js';
 
+// Registrar los componentes necesarios de Chart.js
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
-export default function SunPathChart() {
+/**
+ * Componente de React para mostrar un gráfico del voltaje de la batería a lo largo del tiempo.
+ * Se asume que existe un endpoint de backend en `/api/bateria/historial-voltaje` que devuelve
+ * los datos de voltaje y fecha/hora.
+ */
+export default function VoltageChart() {
   const [chartData, setChartData] = useState({
     labels: [],
     datasets: [
       {
-        label: 'Energía Generada (Wh)',
+        label: 'Voltaje (V)',
         data: [],
-        backgroundColor: 'rgba(98, 255, 0, 0.2)',
-        borderColor: '#62ff00',
-        borderWidth: 2,
-        tension: 0.4,
-        pointBackgroundColor: '#62ff00',
-      },
-      {
-        label: 'Consumo Energético (Wh)',
-        data: [],
-        backgroundColor: 'rgba(255, 153, 0, 0.2)',
+        backgroundColor: 'rgba(255, 153, 0, 0.2)', // Color naranja para voltaje
         borderColor: '#ff9900',
         borderWidth: 2,
         tension: 0.4,
@@ -40,75 +37,47 @@ export default function SunPathChart() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
 
+  // Efecto para cargar los datos del gráfico al montar el componente
   useEffect(() => {
     const fetchData = async () => {
       setMessage('');
       setError(null);
       setLoading(true);
       try {
-        const today = new Date().toISOString().slice(0, 10);
-        console.log(`[SunPathChart] Solicitando datos combinados para: ${today}`);
+        // Asumimos un endpoint para obtener el historial diario de la batería
+        // En tu backend, necesitarías un endpoint que devuelva un array de objetos como:
+        // [{ voltaje: 1.5, fecha_hora: '2023-10-27T10:00:00Z' }, ...]
+        const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/historial-voltaje`);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const historicalData = await response.json();
+        console.log("[VoltageChart] Datos de voltaje recibidos:", historicalData);
 
-        const energyResponse = await fetch(`https://solartrackerweb.onrender.com/api/panel-solar/energia-diaria?date=${today}`);
-        if (!energyResponse.ok) throw new Error(`HTTP error! status: ${energyResponse.status} (Energía)`);
-        const energyData = await energyResponse.json();
-        console.log("[SunPathChart] Datos de energía generada recibidos:", energyData);
-
-        const consumptionResponse = await fetch(`https://solartrackerweb.onrender.com/api/panel-solar/consumo-diario?date=${today}`);
-        if (!consumptionResponse.ok) throw new Error(`HTTP error! status: ${consumptionResponse.status} (Consumo)`);
-        const consumptionData = await consumptionResponse.json();
-        console.log("[SunPathChart] Datos de consumo energético recibidos:", consumptionData);
-
-        if (energyData.length === 0 && consumptionData.length === 0) {
-          setMessage("No hay datos de energía generada ni consumida para hoy.");
+        if (historicalData.length === 0) {
+          setMessage("No hay datos de voltaje disponibles para graficar.");
           setChartData(prev => ({
             ...prev,
             labels: [],
-            datasets: [
-              { ...prev.datasets[0], data: [] },
-              { ...prev.datasets[1], data: [] }
-            ]
+            datasets: [{ ...prev.datasets[0], data: [] }]
           }));
           return;
         }
 
-        const allHours = [];
-        for (let i = 0; i < 24; i++) {
-          allHours.push(`${i.toString().padStart(2, '0')}:00`);
-        }
-
-        const generatedValues = new Array(allHours.length).fill(0);
-        const consumedValues = new Array(allHours.length).fill(0);
-
-        energyData.forEach(item => {
-          const index = allHours.indexOf(item.hora);
-          if (index !== -1) {
-            generatedValues[index] = parseFloat(item.energia_wh || 0);
-          }
+        // Extraer etiquetas (fecha y hora) y valores de voltaje
+        const labels = historicalData.map(item => {
+          const date = new Date(item.fecha_hora);
+          return date.toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' });
         });
 
-        consumptionData.forEach(item => {
-          const index = allHours.indexOf(item.hora);
-          if (index !== -1) {
-            consumedValues[index] = parseFloat(item.consumo_wh || 0);
-          }
-        });
+        const dataPoints = historicalData.map(item => parseFloat(item.voltaje));
 
         setChartData({
-          labels: allHours,
+          labels: labels,
           datasets: [
             {
-              label: 'Energía Generada (Wh)',
-              data: generatedValues,
-              backgroundColor: 'rgba(98, 255, 0, 0.2)',
-              borderColor: '#62ff00',
-              borderWidth: 2,
-              tension: 0.4,
-              pointBackgroundColor: '#62ff00',
-            },
-            {
-              label: 'Consumo Energético (Wh)',
-              data: consumedValues,
+              label: 'Voltaje (V)',
+              data: dataPoints,
               backgroundColor: 'rgba(255, 153, 0, 0.2)',
               borderColor: '#ff9900',
               borderWidth: 2,
@@ -119,8 +88,8 @@ export default function SunPathChart() {
         });
 
       } catch (err) {
-        console.error("[SunPathChart] Error al cargar datos combinados:", err);
-        setError("Error: " + (err.message || "No se pudieron cargar los datos de energía diaria combinados."));
+        console.error("[VoltageChart] Error al cargar datos de voltaje:", err);
+        setError("Error: " + (err.message || "No se pudieron cargar los datos de voltaje de la batería."));
       } finally {
         setLoading(false);
       }
@@ -138,12 +107,12 @@ export default function SunPathChart() {
       },
       tooltip: {
         callbacks: {
-          label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(2)} Wh`,
+          label: (ctx) => `${ctx.dataset.label}: ${ctx.raw.toFixed(3)} V`,
         },
       },
       title: {
         display: true,
-        text: 'Energía Diaria Generada vs. Consumida',
+        text: 'Historial del Voltaje de Batería',
         color: '#000',
       },
     },
@@ -152,10 +121,10 @@ export default function SunPathChart() {
         beginAtZero: true,
         title: {
           display: true,
-          text: 'Vatios-hora (Wh)',
+          text: 'Voltaje (V)',
           color: '#000',
         },
-        ticks: { color: '#000' },
+        ticks: { color: '#000', min: 0, max: 2.5 }, // Ajustado para un rango de voltaje típico de batería
       },
       x: {
         title: {
@@ -168,13 +137,13 @@ export default function SunPathChart() {
     },
   };
 
-  if (loading) return <div className="chart-loading">Cargando datos diarios combinados...</div>;
+  if (loading) return <div className="chart-loading">Cargando datos de voltaje de la batería...</div>;
   if (error) return <div className="chart-error">Error: {error}</div>;
   if (message) return <div className="chart-info">{message}</div>;
 
   return (
     <div style={{ height: '310px', minHeight: '180px' }}>
-      <h2>Energía Diaria Generada vs. Consumida</h2>
+      <h2>Historial de Voltaje</h2>
       <Line data={chartData} options={options} />
     </div>
   );
