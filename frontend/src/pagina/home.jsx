@@ -16,7 +16,6 @@ function Home() {
       </div>
 
       <div className="layout">
-        {/* Lado Izquierdo: información del tracker */}
         <div className="left-charts">
           <div className="chart-box"><Direccion /></div>
           <div className="chart-box"><Estado /></div>
@@ -25,9 +24,8 @@ function Home() {
 
         {/* Lado Derecho: gráficos de la batería (porcentaje y voltaje) */}
         <div className="right-charts">
-          {/* Gráficos de la batería usando tus nuevos componentes */}
           <div className="chart-box"><Porcentaje /></div>
-          <div className="chart-box"><Voltaje /></div>
+          <Voltaje />
         </div>
       </div>
     </div>
