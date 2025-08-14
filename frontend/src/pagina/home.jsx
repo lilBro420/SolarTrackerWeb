@@ -1,12 +1,10 @@
 import React from 'react';
-// Rutas de importación corregidas
-import Direccion from './componentes/Direccion';
-import Estado from './componentes/Estado';
-import Ultimos from './componentes/Ultimos';
-import SunPathChart from './componentes/VoltageChart';
-import MonthlySunPathChart from './componentes/BatteryChart';
-import BatteryChart from './componentes/BatteryChart'; 
-import VoltageChart from './componentes/VoltageChart'; 
+// Importaciones de tus nuevos componentes de gráficos de batería
+import Direccion from './componentes/Direccion/Direccion';
+import Estado from './componentes/Estado/Estado';
+import Ultimos from './componentes/Ultimos/Ultimos';
+import Porcentaje from './componentes/Porcentaje/Porcentaje';
+import Voltaje from './componentes/Voltaje/Voltaje';
 import './styles/solarPanel.css';
 
 function Home() {
@@ -18,20 +16,18 @@ function Home() {
       </div>
 
       <div className="layout">
-        {/* Lado Izquierdo: energía */}
+        {/* Lado Izquierdo: información del tracker */}
         <div className="left-charts">
           <div className="chart-box"><Direccion /></div>
           <div className="chart-box"><Estado /></div>
           <div className="chart-box"><Ultimos /></div>
         </div>
 
-        {/* Lado Derecho: Trayectoria solar */}
+        {/* Lado Derecho: gráficos de la batería (porcentaje y voltaje) */}
         <div className="right-charts">
-          <div className="chart-box"><MonthlySunPathChart /></div>
-          <div className="chart-box"><SunPathChart /></div>
-          {/* Aquí se agregaron los nuevos gráficos */}
-          <div className="chart-box"><BatteryChart /></div>
-          <div className="chart-box"><VoltageChart /></div>
+          {/* Gráficos de la batería usando tus nuevos componentes */}
+          <div className="chart-box"><Porcentaje /></div>
+          <div className="chart-box"><Voltaje /></div>
         </div>
       </div>
     </div>
