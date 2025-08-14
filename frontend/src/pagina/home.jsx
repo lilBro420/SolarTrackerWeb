@@ -1,12 +1,15 @@
 import React from 'react';
-import Direccion from '../componentes/Direccion';
-import Estado from '../componentes/Estado';
-import Ultimos from '../componentes/Ultimos';
-import SunPathChart from '../componentes/SunPathChart';
-import MonthlySunPathChart from '../componentes/MonthlySunPathChart';
-import '../styles/solarPanel.css';
+// Rutas de importación corregidas
+import Direccion from './componentes/Direccion';
+import Estado from './componentes/Estado';
+import Ultimos from './componentes/Ultimos';
+import SunPathChart from './componentes/SunPathChart';
+import MonthlySunPathChart from './componentes/MonthlySunPathChart';
+import BatteryChart from './componentes/BatteryChart'; 
+import VoltageChart from './componentes/VoltageChart'; 
+import './styles/solarPanel.css';
 
-function Inicio() {
+function Home() {
   return (
     <div className="panel-container">
       <div className="header">
@@ -22,15 +25,17 @@ function Inicio() {
           <div className="chart-box"><Ultimos /></div>
         </div>
 
-        {/* Lado Derecho: Trayectoria solar pa */}
+        {/* Lado Derecho: Trayectoria solar */}
         <div className="right-charts">
           <div className="chart-box"><MonthlySunPathChart /></div>
           <div className="chart-box"><SunPathChart /></div>
-         {/* aqui van las demas graficas*/}
+          {/* Aquí se agregaron los nuevos gráficos */}
+          <div className="chart-box"><BatteryChart /></div>
+          <div className="chart-box"><VoltageChart /></div>
         </div>
       </div>
     </div>
   );
 }
 
-export default Inicio;
+export default Home;
