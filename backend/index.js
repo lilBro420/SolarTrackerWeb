@@ -532,36 +532,7 @@ app.get('/api/bateria/porcentaje', (req, res) => {
 });
 
 // --- Endpoint para obtener el último voltaje de la batería ---
-app.get('/api/bateria/voltaje', (req, res) => {
-  const query = `
-    SELECT
-      voltaje,
-      fecha_hora
-    FROM bateria
-    ORDER BY fecha_hora DESC
-    LIMIT 1;
-  `;
-
-  pool.query(query, (err, results) => {
-    if (err) {
-      console.error('Error al obtener el voltaje de la batería:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener el voltaje de la batería.' });
-    }
-
-    if (results.length === 0) {
-      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
-    }
-
-    const lastRecord = results[0];
-    res.json({
-      voltaje: lastRecord.voltaje,
-      ultima_actualizacion: lastRecord.fecha_hora
-    });
-  });
-});
-
-//graficas bateria
-// --- Endpoint para obtener el último porcentaje de la batería ---
+// --- Endpoint para obtener el porcentaje de la batería ---
 app.get('/api/bateria/porcentaje', (req, res) => {
   const query = `
     SELECT
@@ -569,7 +540,7 @@ app.get('/api/bateria/porcentaje', (req, res) => {
       fecha_hora
     FROM bateria
     ORDER BY fecha_hora DESC
-    LIMIT 20;  // <-- CAMBIO AQUÍ: Ahora obtendrá los últimos 20 registros
+    LIMIT 20; // Obtén los últimos 20 registros para el gráfico
   `;
 
   pool.query(query, (err, results) => {
@@ -582,14 +553,39 @@ app.get('/api/bateria/porcentaje', (req, res) => {
       return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    // El resultado ya es un array, se puede enviar directamente.
-    // También es buena práctica revertirlo para que la cronología en el gráfico sea correcta
-    // (del más antiguo al más reciente).
-    res.json(results.reverse()); 
+    // Envía el array de resultados completo y en orden cronológico
+    res.json(results.reverse());
+  });
+});
+//graficas bateria
+// --- Endpoint para obtener el porcentaje de la batería ---
+app.get('/api/bateria/porcentaje', (req, res) => {
+  const query = `
+    SELECT
+      porcentaje,
+      fecha_hora
+    FROM bateria
+    ORDER BY fecha_hora DESC
+    LIMIT 20; // Obtén los últimos 20 registros para el gráfico
+  `;
+
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener el porcentaje de la batería:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener el porcentaje de la batería.' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
+    }
+
+    // Envía el array de resultados completo y en orden cronológico
+    res.json(results.reverse());
   });
 });
 
 // --- Endpoint para obtener el último voltaje de la batería ---
+// --- Endpoint para obtener el voltaje de la batería ---
 app.get('/api/bateria/voltaje', (req, res) => {
   const query = `
     SELECT
@@ -597,7 +593,7 @@ app.get('/api/bateria/voltaje', (req, res) => {
       fecha_hora
     FROM bateria
     ORDER BY fecha_hora DESC
-    LIMIT 20; 
+    LIMIT 20; // Obtén los últimos 20 registros para el gráfico
   `;
 
   pool.query(query, (err, results) => {
@@ -610,9 +606,7 @@ app.get('/api/bateria/voltaje', (req, res) => {
       return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    // El resultado ya es un array, se puede enviar directamente.
-    // Es buena práctica revertirlo para que la cronología sea correcta
-    // (del más antiguo al más reciente).
+    // Envía el array de resultados completo y en orden cronológico
     res.json(results.reverse());
   });
 });
