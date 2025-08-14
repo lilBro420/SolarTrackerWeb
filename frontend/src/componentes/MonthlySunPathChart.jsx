@@ -47,7 +47,7 @@ export default function BatteryChart() {
         // Asumimos un endpoint para obtener el historial diario de la batería
         // En tu backend, necesitarías un endpoint que devuelva un array de objetos como:
         // [{ porcentaje: 95.5, fecha_hora: '2023-10-27T10:00:00Z' }, ...]
-        const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/historial-diario`);
+        const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/porcentaje`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }

@@ -560,88 +560,64 @@ app.get('/api/bateria/voltaje', (req, res) => {
   });
 });
 
-// --- NUEVO ENDPOINT PARA HISTORIAL DE PORCENTAJE DIARIO ---
-app.get('/api/bateria/historial-porcentaje', (req, res) => {
-  const { date } = req.query;
-
-  if (!date) {
-    return res.status(400).json({ error: 'Falta el parámetro de fecha (ej. ?date=YYYY-MM-DD)' });
-  }
-
-  const sql = `
+//graficas bateria
+// --- Endpoint para obtener el último porcentaje de la batería ---
+app.get('/api/bateria/porcentaje', (req, res) => {
+  const query = `
     SELECT
       porcentaje,
       fecha_hora
     FROM bateria
-    WHERE DATE(fecha_hora) = ?
-    ORDER BY fecha_hora ASC;
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
   `;
 
-  pool.query(sql, [date], (err, results) => {
+  pool.query(query, (err, results) => {
     if (err) {
-      console.error('Error al obtener el historial de porcentaje de batería:', err);
-      return res.status(500).json({ error: 'Error del servidor al obtener datos de batería.' });
+      console.error('Error al obtener el porcentaje de la batería:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener el porcentaje de la batería.' });
     }
 
     if (results.length === 0) {
-      return res.status(404).json({ message: 'No hay datos de porcentaje para la fecha solicitada.' });
+      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
     }
 
-    res.json(results);
+    const lastRecord = results[0];
+    res.json({
+      porcentaje: lastRecord.porcentaje,
+      ultima_actualizacion: lastRecord.fecha_hora
+    });
   });
 });
 
-// --- NUEVO ENDPOINT PARA HISTORIAL DE VOLTAJE DIARIO ---
-app.get('/api/bateria/historial-voltaje', (req, res) => {
-  const { date } = req.query;
+// --- Endpoint para obtener el último voltaje de la batería ---
+app.get('/api/bateria/voltaje', (req, res) => {
+  const query = `
+    SELECT
+      voltaje,
+      fecha_hora
+    FROM bateria
+    ORDER BY fecha_hora DESC
+    LIMIT 1;
+  `;
 
-  if (!date) {
-    // Si no se proporciona una fecha, obtiene los datos de hoy
-    const today = new Date().toISOString().slice(0, 10);
-    const sql = `
-      SELECT
-        voltaje,
-        fecha_hora
-      FROM bateria
-      WHERE DATE(fecha_hora) = ?
-      ORDER BY fecha_hora ASC;
-    `;
-    pool.query(sql, [today], (err, results) => {
-      if (err) {
-        console.error('Error al obtener el historial de voltaje de batería para hoy:', err);
-        return res.status(500).json({ error: 'Error del servidor al obtener datos de batería.' });
-      }
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'No hay datos de voltaje para hoy.' });
-      }
-      res.json(results);
-    });
-  } else {
-    // Si se proporciona una fecha, la utiliza
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(date)) {
-      return res.status(400).json({ error: 'Formato de fecha inválido. Use YYYY-MM-DD.' });
+  pool.query(query, (err, results) => {
+    if (err) {
+      console.error('Error al obtener el voltaje de la batería:', err);
+      return res.status(500).json({ error: 'Error del servidor al obtener el voltaje de la batería.' });
     }
-    const sql = `
-      SELECT
-        voltaje,
-        fecha_hora
-      FROM bateria
-      WHERE DATE(fecha_hora) = ?
-      ORDER BY fecha_hora ASC;
-    `;
-    pool.query(sql, [date], (err, results) => {
-      if (err) {
-        console.error('Error al obtener el historial de voltaje de batería:', err);
-        return res.status(500).json({ error: 'Error del servidor al obtener datos de batería.' });
-      }
-      if (results.length === 0) {
-        return res.status(404).json({ message: 'No hay datos de voltaje para la fecha solicitada.' });
-      }
-      res.json(results);
-    });
-  }
-});
 
+    if (results.length === 0) {
+      return res.status(404).json({ message: 'No hay datos de batería disponibles.' });
+    }
+
+    const lastRecord = results[0];
+    res.json({
+      voltaje: lastRecord.voltaje,
+      ultima_actualizacion: lastRecord.fecha_hora
+    });
+  });
+});
 
 // Verificar correo registrado
 app.post('/api/verificar-correo', (req, res) => {

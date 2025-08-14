@@ -39,7 +39,7 @@ export default function VoltageChart() {
       setError(null);
       setLoading(true);
       try {
-        const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/historial-voltaje`);
+        const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/voltaje`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
