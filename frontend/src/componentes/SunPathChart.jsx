@@ -13,11 +13,7 @@ import {
 // Registrar los componentes necesarios de Chart.js
 ChartJS.register(CategoryScale, LinearScale, LineElement, PointElement, Tooltip, Legend);
 
-/**
- * Componente de React para mostrar un gráfico del voltaje de la batería a lo largo del tiempo.
- * Se asume que existe un endpoint de backend en `/api/bateria/historial-voltaje` que devuelve
- * los datos de voltaje y fecha/hora.
- */
+
 export default function VoltageChart() {
   const [chartData, setChartData] = useState({
     labels: [],
@@ -37,16 +33,12 @@ export default function VoltageChart() {
   const [error, setError] = useState(null);
   const [message, setMessage] = useState('');
 
-  // Efecto para cargar los datos del gráfico al montar el componente
   useEffect(() => {
     const fetchData = async () => {
       setMessage('');
       setError(null);
       setLoading(true);
       try {
-        // Asumimos un endpoint para obtener el historial diario de la batería
-        // En tu backend, necesitarías un endpoint que devuelva un array de objetos como:
-        // [{ voltaje: 1.5, fecha_hora: '2023-10-27T10:00:00Z' }, ...]
         const response = await fetch(`https://solartrackerweb.onrender.com/api/bateria/historial-voltaje`);
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
