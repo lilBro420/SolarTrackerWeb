@@ -1,11 +1,11 @@
 import React from 'react';
 // Importaciones de tus nuevos componentes de gráficos de batería
-import Direccion from './componentes/Direccion/Direccion';
-import Estado from './componentes/Estado/Estado';
-import Ultimos from './componentes/Ultimos/Ultimos';
-import Porcentaje from './componentes/Porcentaje/Porcentaje';
-import Voltaje from './componentes/Voltaje/Voltaje';
-import './styles/solarPanel.css';
+import Direccion from '../componentes/Direccion';
+import Estado from '../componentes/Estado';
+import Ultimos from '../componentes/Ultimos';
+import Porcentaje from '../componentes/Porcentaje';
+import Voltaje from '../componentes/Voltaje';
+import '../styles/solarPanel.css';
 
 function Home() {
   return (
